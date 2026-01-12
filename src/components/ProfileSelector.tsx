@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useStore, AVAILABLE_AVATARS } from '../store/useStore';
+import { useStore } from '../store/useStore';
+import { AVATAR_EMOJIS } from '../lib/constants';
 import { Modal } from './Modal';
 import { Button } from './Button';
 import { Plus, Trash2, Edit2, Check } from 'lucide-react';
@@ -25,13 +26,13 @@ export const ProfileSelector = ({ isOpen, onClose }: ProfileSelectorProps) => {
     const [isAddingNew, setIsAddingNew] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [newName, setNewName] = useState('');
-    const [newIcon, setNewIcon] = useState(AVAILABLE_AVATARS[0]);
+    const [newIcon, setNewIcon] = useState(AVATAR_EMOJIS[0]);
 
     const handleAddProfile = () => {
         if (!newName.trim()) return;
         addProfile(newName.trim(), newIcon);
         setNewName('');
-        setNewIcon(AVAILABLE_AVATARS[0]);
+        setNewIcon(AVATAR_EMOJIS[0]);
         setIsAddingNew(false);
     };
 
@@ -79,7 +80,7 @@ export const ProfileSelector = ({ isOpen, onClose }: ProfileSelectorProps) => {
                                     // Edit Mode
                                     <div className="flex-1 flex flex-col gap-2">
                                         <div className="flex gap-1 justify-center flex-wrap">
-                                            {AVAILABLE_AVATARS.map((emoji) => (
+                                            {AVATAR_EMOJIS.map((emoji) => (
                                                 <button
                                                     key={emoji}
                                                     onClick={() => setNewIcon(emoji)}
@@ -160,7 +161,7 @@ export const ProfileSelector = ({ isOpen, onClose }: ProfileSelectorProps) => {
                         className="p-4 bg-slate-50 rounded-xl space-y-3"
                     >
                         <div className="flex gap-2 justify-center">
-                            {AVAILABLE_AVATARS.map((emoji) => (
+                            {AVATAR_EMOJIS.map((emoji) => (
                                 <button
                                     key={emoji}
                                     onClick={() => setNewIcon(emoji)}

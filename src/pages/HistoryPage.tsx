@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Calendar, ChevronLeft, ChevronRight, BarChart3, Trash2 } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, BarChart3, Trash2, RotateCcw } from 'lucide-react';
+import { Button } from '../components/Button';
 import { useStore } from '../store/useStore';
 import { Card } from '../components/Card';
 
@@ -122,6 +123,10 @@ export const HistoryPage = () => {
         setCurrentDate(newDate);
     };
 
+    const handleJumpToToday = () => {
+        setCurrentDate(new Date());
+    };
+
     const getHeaderLabel = () => {
         if (viewMode === 'day') return currentDate.toLocaleDateString(isJa ? 'ja-JP' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
         if (viewMode === 'month') return currentDate.toLocaleDateString(isJa ? 'ja-JP' : 'en-US', { year: 'numeric', month: 'long' });
@@ -185,6 +190,9 @@ export const HistoryPage = () => {
                     <button onClick={handleNext} className="p-2 hover:bg-slate-100 rounded-full text-slate-500">
                         <ChevronRight />
                     </button>
+                    <Button variant="ghost" size="sm" onClick={handleJumpToToday} className="ml-2">
+                        <RotateCcw size={16} />
+                    </Button>
                 </div>
 
                 {/* --- DAY VIEW --- */}

@@ -8,17 +8,17 @@ import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { ProfileSelector } from '../components/ProfileSelector';
 import { playTapSound, playFanfareSound } from '../lib/sounds';
 import { Users, Shuffle, Sparkles } from 'lucide-react';
+import { MAX_LEVEL } from '../lib/constants';
+import {
+    calculateLevel,
+    calculateProgress,
+    getPointsToNextLevel,
+    getHeroImage,
+    getLevelTitle as getLevelTitleUtil,
+    getLevelsToEvolution,
+    getMonthStart,
+} from '../lib/levelUtils';
 
-// Monthly level system constants
-const MAX_LEVEL = 50;
-const POINTS_FOR_MAX = 4800; // 80% of theoretical max (6000pt)
-const POINTS_PER_LEVEL = Math.floor(POINTS_FOR_MAX / (MAX_LEVEL - 1)); // ~100pt per level
-
-// Helper: Get current month's start timestamp
-const getMonthStart = (): Date => {
-    const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-};
 
 export const KidPage = () => {
     const { t, i18n } = useTranslation();
@@ -57,41 +57,14 @@ export const KidPage = () => {
             .reduce((sum, item) => sum + item.pointDiff, 0);
     }, [history]);
 
-    // Level calculation: Based on monthly points, resets each month
-    const rawLevel = Math.floor(monthlyPoints / POINTS_PER_LEVEL) + 1;
-    const level = Math.min(rawLevel, MAX_LEVEL);
-    const pointsInCurrentLevel = monthlyPoints % POINTS_PER_LEVEL;
-    const progressPercent = level >= MAX_LEVEL ? 100 : (pointsInCurrentLevel / POINTS_PER_LEVEL) * 100;
+    // Level calculation: Using centralized utilities
+    const level = calculateLevel(monthlyPoints);
+    const progressPercent = calculateProgress(monthlyPoints);
+    const pointsToNext = getPointsToNextLevel(monthlyPoints);
+    const levelsToEvolution = getLevelsToEvolution(level);
 
-    // Level titles (every 5 levels)
-    const getLevelTitle = (lv: number): string => {
-        if (lv >= 50) return t('level.level50');
-        if (lv >= 45) return t('level.level45');
-        if (lv >= 40) return t('level.level40');
-        if (lv >= 35) return t('level.level35');
-        if (lv >= 30) return t('level.level30');
-        if (lv >= 25) return t('level.level25');
-        if (lv >= 20) return t('level.level20');
-        if (lv >= 15) return t('level.level15');
-        if (lv >= 10) return t('level.level10');
-        if (lv >= 5) return t('level.level5');
-        return t('level.level1');
-    };
-
-    // Hero Image based on level (every 5 levels)
-    const getHeroImage = (lv: number): string => {
-        if (lv >= 50) return '/hero_lv50.png';
-        if (lv >= 45) return '/hero_lv45.png';
-        if (lv >= 40) return '/hero_lv40.png';
-        if (lv >= 35) return '/hero_lv35.png';
-        if (lv >= 30) return '/hero_lv30.png';
-        if (lv >= 25) return '/hero_lv25.png';
-        if (lv >= 20) return '/hero_lv20.png';
-        if (lv >= 15) return '/hero_lv15.png';
-        if (lv >= 10) return '/hero_lv10.png';
-        if (lv >= 5) return '/hero_lv5.png';
-        return '/hero_lv1.png';
-    };
+    // Wrapper for localized level title
+    const getLevelTitle = (lv: number): string => getLevelTitleUtil(lv, t);
 
     // Evolution Logic
     const [showEvolutionModal, setShowEvolutionModal] = useState(false);
@@ -114,13 +87,9 @@ export const KidPage = () => {
         prevLevelRef.current = level;
     }, [level]);
 
-    // Calculate levels until next evolution
-    // Next milestone is next multiple of 5
-    const nextEvolutionLevel = Math.floor(level / 5) * 5 + 5;
-    const levelsToEvolution = nextEvolutionLevel - level;
-
     // Get current month name
     const currentMonthName = new Date().toLocaleDateString(isJa ? 'ja-JP' : 'en-US', { month: 'long' });
+
 
     return (
         <div className="min-h-screen bg-blue-50 pb-24">
@@ -235,7 +204,7 @@ export const KidPage = () => {
                             <div className="flex justify-between text-xs mt-3 font-bold">
                                 <span className="text-blue-600 bg-white/50 px-2 py-1 rounded-lg">
                                     {level < MAX_LEVEL
-                                        ? t('kid.nextLevel', { points: POINTS_PER_LEVEL - pointsInCurrentLevel })
+                                        ? t('kid.nextLevel', { points: pointsToNext })
                                         : (isJa ? '🎉 さいこうレベル！' : '🎉 Max Level!')
                                     }
                                 </span>
@@ -274,11 +243,21 @@ export const KidPage = () => {
                             </div>
                         )}
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        {displayQuests.map((quest) => (
-                            <QuestCard key={quest.id} quest={quest} />
-                        ))}
-                    </div>
+                    {displayQuests.length === 0 ? (
+                        <Card className="p-8 text-center text-slate-400 bg-white/50 border-dashed col-span-2">
+                            <p className="font-bold text-lg mb-2">💤</p>
+                            <p>{isJa ? '今日のクエストはもうないよ！' : 'No quests for today!'}</p>
+                            <p className="text-sm mt-2 text-slate-500">
+                                {isJa ? 'またあしたね！' : 'See you tomorrow!'}
+                            </p>
+                        </Card>
+                    ) : (
+                        <div className="grid grid-cols-2 gap-4">
+                            {displayQuests.map((quest) => (
+                                <QuestCard key={quest.id} quest={quest} />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </main>
 

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { type AppState, type Quest, type Reward, type ChildProfile } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import { DAILY_QUEST_COUNT, MAX_RESETS_PER_DAY, AVATAR_EMOJIS } from '../lib/constants';
 
 // Initial default data with bilingual support
 const DEFAULT_QUESTS: Quest[] = [
@@ -21,10 +22,8 @@ const DEFAULT_REWARDS: Reward[] = [
     { id: 'r3', title: 'ゲーム 1じかん', titleEn: 'Gaming 1hr', cost: 500, icon: '🎮' },
 ];
 
-const AVATAR_EMOJIS = ['🦸', '🧙', '🧚', '🦊', '🐻'];
-
 // Create a default profile
-const createDefaultProfile = (name: string = 'ゆうしゃ', icon: string = '🦸'): ChildProfile => ({
+const createDefaultProfile = (name: string = 'ゆうしゃ', icon: string = AVATAR_EMOJIS[0]): ChildProfile => ({
     id: uuidv4(),
     name,
     icon,
@@ -48,10 +47,6 @@ const getTodayStr = (): string => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 };
-
-// Constants for daily quest system
-const DAILY_QUEST_COUNT = 4; // Number of random quests to show
-const MAX_RESETS_PER_DAY = 2;
 
 export const useStore = create<AppState>()(
     persist(
@@ -508,5 +503,4 @@ export const useStore = create<AppState>()(
     )
 );
 
-// Export helper for available avatars
-export const AVAILABLE_AVATARS = AVATAR_EMOJIS;
+
