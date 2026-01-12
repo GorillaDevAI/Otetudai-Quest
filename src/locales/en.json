@@ -14,12 +14,17 @@
     },
     "level": {
         "title": "Lv.{{level}}",
-        "beginner": "Beginner Adventurer",
-        "apprentice": "Apprentice Hero",
-        "decent": "Rising Hero",
-        "great": "Amazing Hero",
-        "grand": "Grand Hero",
-        "legendary": "Legendary Hero"
+        "level1": "Beginner Adventurer",
+        "level5": "Apprentice Hero",
+        "level10": "Official Hero",
+        "level15": "Veteran Hero",
+        "level20": "Hero Captain",
+        "level25": "Hero General",
+        "level30": "National Hero",
+        "level35": "Grand Hero",
+        "level40": "Legendary Hero",
+        "level45": "Mythical Hero",
+        "level50": "Ultimate Hero"
     },
     "reward": {
         "shopTitle": "Reward Shop",

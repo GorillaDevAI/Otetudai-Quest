@@ -11,20 +11,45 @@ export const KidPage = () => {
     const totalPointsEarned = useStore((state) => state.totalPointsEarned);
     const quests = useStore((state) => state.quests);
 
-    // Level calculation: Every 200 points = 1 level
+    // Level calculation: Every 200 points = 1 level, max 50
     const POINTS_PER_LEVEL = 200;
-    const level = Math.floor(totalPointsEarned / POINTS_PER_LEVEL) + 1;
+    const rawLevel = Math.floor(totalPointsEarned / POINTS_PER_LEVEL) + 1;
+    const level = Math.min(rawLevel, 50);
     const pointsInCurrentLevel = totalPointsEarned % POINTS_PER_LEVEL;
-    const progressPercent = (pointsInCurrentLevel / POINTS_PER_LEVEL) * 100;
+    const progressPercent = level >= 50 ? 100 : (pointsInCurrentLevel / POINTS_PER_LEVEL) * 100;
 
-    // Level titles
+    // Level titles (every 5 levels)
     const getLevelTitle = (lv: number): string => {
-        if (lv >= 20) return t('level.legendary');
-        if (lv >= 15) return t('level.grand');
-        if (lv >= 10) return t('level.great');
-        if (lv >= 5) return t('level.decent');
-        if (lv >= 3) return t('level.apprentice');
-        return t('level.beginner');
+        if (lv >= 50) return t('level.level50');
+        if (lv >= 45) return t('level.level45');
+        if (lv >= 40) return t('level.level40');
+        if (lv >= 35) return t('level.level35');
+        if (lv >= 30) return t('level.level30');
+        if (lv >= 25) return t('level.level25');
+        if (lv >= 20) return t('level.level20');
+        if (lv >= 15) return t('level.level15');
+        if (lv >= 10) return t('level.level10');
+        if (lv >= 5) return t('level.level5');
+        return t('level.level1');
+    };
+
+    // Hero Image based on level (every 5 levels)
+    const getHeroImage = (lv: number): string => {
+        // We will generate these images: 
+        // hero_lv1.png, hero_lv5.png, hero_lv10.png ... hero_lv50.png
+        // Fallback to lower tiers if image doesn't exist yet (logic-wise we map to 1, 5, 10...)
+
+        if (lv >= 50) return '/hero_lv50.png';
+        if (lv >= 45) return '/hero_lv45.png'; // Will use lv25 or similar if not ready
+        if (lv >= 40) return '/hero_lv40.png';
+        if (lv >= 35) return '/hero_lv35.png';
+        if (lv >= 30) return '/hero_lv30.png';
+        if (lv >= 25) return '/hero_lv25.png';
+        if (lv >= 20) return '/hero_lv20.png';
+        if (lv >= 15) return '/hero_lv15.png';
+        if (lv >= 10) return '/hero_lv10.png';
+        if (lv >= 5) return '/hero_lv5.png';
+        return '/hero_lv1.png';
     };
 
     return (
@@ -56,7 +81,11 @@ export const KidPage = () => {
                 <Card variant="colorful" className="p-4 relative overflow-hidden">
                     <div className="flex items-center gap-4">
                         <img
-                            src="/hero.png"
+                            src={getHeroImage(level)}
+                            onError={(e) => {
+                                // Fallback to lv1 if specific level image missing
+                                e.currentTarget.src = '/hero_lv1.png';
+                            }}
                             alt="Hero"
                             className="w-20 h-20 object-contain drop-shadow-lg"
                         />
