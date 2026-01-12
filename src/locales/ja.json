@@ -1,0 +1,74 @@
+{
+    "common": {
+        "points": "pt",
+        "currentPoints": "いまのポイント",
+        "settings": "設定"
+    },
+    "kid": {
+        "todayQuests": "今日のクエスト",
+        "rewards": "ごほうび",
+        "complete": "できた！",
+        "congratulations": "やったね！",
+        "pointsGet": "+{{points}}pt ゲット！",
+        "nextLevel": "つぎのレベルまで あと {{points}}pt"
+    },
+    "level": {
+        "title": "Lv.{{level}}",
+        "beginner": "かけだしぼうけんしゃ",
+        "apprentice": "みならいゆうしゃ",
+        "decent": "いっぱしのゆうしゃ",
+        "great": "すごいゆうしゃ",
+        "grand": "だいゆうしゃ",
+        "legendary": "でんせつのゆうしゃ"
+    },
+    "reward": {
+        "shopTitle": "ごほうびショップ",
+        "exchange": "こうかん",
+        "exchangeConfirm": "{{name}} と こうかんしますか？",
+        "exchanged": "こうかんしました！",
+        "showParent": "おうちのひとに みせてね",
+        "back": "もどる"
+    },
+    "parent": {
+        "title": "保護者設定",
+        "quests": "クエスト",
+        "rewards": "ごほうび",
+        "dataManagement": "データ管理",
+        "questList": "おてつだい一覧",
+        "rewardList": "ごほうび一覧",
+        "add": "追加",
+        "delete": "削除",
+        "deleteConfirm": "削除しますか？",
+        "addQuest": "クエストを追加",
+        "addReward": "ごほうびを追加",
+        "questName": "クエストのなまえ",
+        "rewardName": "ごほうびのなまえ",
+        "pointsToGet": "もらえるポイント",
+        "pointsNeeded": "ひつようなポイント",
+        "icon": "アイコン",
+        "iconDesc": "絵文字を1つ入力してね (例: 🐕)",
+        "save": "保存する",
+        "backup": "バックアップ（保存）",
+        "backupDesc": "現在のデータをファイルとしてダウンロードします。ポイントが消えないように、定期的に保存してください。",
+        "saveToFile": "ファイルに保存する",
+        "savedMessage": "データをダウンロードしました！大切に保管してください。",
+        "restore": "復元（読み込み）",
+        "restoreDesc": "バックアップしたJSONファイルを選択してください。",
+        "restoreBtn": "📂 ファイルを選択して復元",
+        "restoreConfirm": "現在のデータが上書きされます。よろしいですか？",
+        "restoredMessage": "データを復元しました！",
+        "restoreError": "データの読み込みに失敗しました。正しいJSONデータですか？",
+        "resetAll": "全データリセット",
+        "resetConfirm": "本当に全てのデータをリセットしますか？この操作は取り消せません。",
+        "addQuestName": "クエストのなまえ (例: いぬのさんぽ)",
+        "addQuestPoints": "もらえるポイント (例: 100)",
+        "addQuestIcon": "アイコンの絵文字 (例: 🐕)",
+        "addRewardName": "ごほうびのなまえ (例: ゲーム1じかん)",
+        "addRewardCost": "ひつようなポイント (例: 500)",
+        "addRewardIcon": "アイコンの絵文字 (例: 🎮)",
+        "numberError": "ポイントは数字でいれてね"
+    },
+    "auth": {
+        "enterPassword": "パスワードを入れてね (1234)"
+    }
+}

@@ -1,0 +1,74 @@
+{
+    "common": {
+        "points": "pt",
+        "currentPoints": "Current Points",
+        "settings": "Settings"
+    },
+    "kid": {
+        "todayQuests": "Today's Quests",
+        "rewards": "Rewards",
+        "complete": "Done!",
+        "congratulations": "Great job!",
+        "pointsGet": "+{{points}}pt earned!",
+        "nextLevel": "{{points}}pt to next level"
+    },
+    "level": {
+        "title": "Lv.{{level}}",
+        "beginner": "Beginner Adventurer",
+        "apprentice": "Apprentice Hero",
+        "decent": "Rising Hero",
+        "great": "Amazing Hero",
+        "grand": "Grand Hero",
+        "legendary": "Legendary Hero"
+    },
+    "reward": {
+        "shopTitle": "Reward Shop",
+        "exchange": "Exchange",
+        "exchangeConfirm": "Exchange for {{name}}?",
+        "exchanged": "Exchanged!",
+        "showParent": "Show this to your parents",
+        "back": "Back"
+    },
+    "parent": {
+        "title": "Parent Settings",
+        "quests": "Quests",
+        "rewards": "Rewards",
+        "dataManagement": "Data",
+        "questList": "Quest List",
+        "rewardList": "Reward List",
+        "add": "Add",
+        "delete": "Delete",
+        "deleteConfirm": "Delete this item?",
+        "addQuest": "Add Quest",
+        "addReward": "Add Reward",
+        "questName": "Quest Name",
+        "rewardName": "Reward Name",
+        "pointsToGet": "Points Earned",
+        "pointsNeeded": "Points Cost",
+        "icon": "Icon",
+        "iconDesc": "Enter an emoji (e.g. 🐕)",
+        "save": "Save",
+        "backup": "Backup (Save)",
+        "backupDesc": "Download your data as a file. Save regularly to prevent data loss.",
+        "saveToFile": "Save to File",
+        "savedMessage": "Data saved! Keep it safe.",
+        "restore": "Restore (Load)",
+        "restoreDesc": "Select your backup JSON file to restore.",
+        "restoreBtn": "📂 Select File to Restore",
+        "restoreConfirm": "This will overwrite current data. Continue?",
+        "restoredMessage": "Data restored!",
+        "restoreError": "Failed to load data. Is it valid JSON?",
+        "resetAll": "Reset All Data",
+        "resetConfirm": "Are you sure you want to reset all data? This cannot be undone.",
+        "addQuestName": "Quest name (e.g., Walk the dog)",
+        "addQuestPoints": "Points earned (e.g., 100)",
+        "addQuestIcon": "Icon emoji (e.g., 🐕)",
+        "addRewardName": "Reward name (e.g., 1 hour of gaming)",
+        "addRewardCost": "Points needed (e.g., 500)",
+        "addRewardIcon": "Icon emoji (e.g., 🎮)",
+        "numberError": "Please enter a number"
+    },
+    "auth": {
+        "enterPassword": "Enter password (1234)"
+    }
+}

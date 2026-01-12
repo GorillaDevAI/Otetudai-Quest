@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+body {
+  @apply bg-sky-50 text-gray-800 antialiased overflow-x-hidden;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+}
+
+/* Custom scrollbar for cute look */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
