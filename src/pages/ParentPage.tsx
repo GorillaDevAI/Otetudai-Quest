@@ -9,7 +9,7 @@ import { ArrowLeft, Upload, Download, Trash2, Plus } from 'lucide-react';
 import { useLocalizedTitle } from '../lib/useLocalizedTitle';
 
 export const ParentPage = ({ onSwitchMode }: { onSwitchMode: () => void }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { getQuestTitle, getRewardTitle } = useLocalizedTitle();
     const store = useStore();
     const [activeTab, setActiveTab] = useState<'quests' | 'rewards' | 'data'>('quests');
@@ -59,13 +59,14 @@ export const ParentPage = ({ onSwitchMode }: { onSwitchMode: () => void }) => {
         }
     };
 
-    const handleSaveItem = (title: string, point: number, icon: string) => {
+    const handleSaveItem = (title: string, point: number, icon: string, oncePerDay?: boolean) => {
         if (addItemType === 'quest') {
             store.addQuest({
                 id: crypto.randomUUID(),
                 title, // Default Japanese/Fallback title
                 point,
                 icon,
+                oncePerDay: oncePerDay || false,
             });
         } else if (addItemType === 'reward') {
             store.addReward({
@@ -76,6 +77,7 @@ export const ParentPage = ({ onSwitchMode }: { onSwitchMode: () => void }) => {
             });
         }
     };
+
 
     return (
         <div className="min-h-screen bg-slate-100 pb-20">
@@ -121,19 +123,46 @@ export const ParentPage = ({ onSwitchMode }: { onSwitchMode: () => void }) => {
                                 </Button>
                             </div>
                             {store.quests.map((quest) => (
-                                <Card key={quest.id} className="p-4 flex items-center justify-between bg-white">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-3xl">{quest.icon}</span>
-                                        <div>
-                                            <div className="font-bold">{getQuestTitle(quest)}</div>
-                                            <div className="text-sm font-bold text-orange-500">🪙 {quest.point}pt</div>
+                                <Card key={quest.id} className="p-4 bg-white">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-3xl">{quest.icon}</span>
+                                            <div>
+                                                <div className="font-bold">{getQuestTitle(quest)}</div>
+                                                <div className="text-sm font-bold text-orange-500">🪙 {quest.point}pt</div>
+                                            </div>
                                         </div>
+                                        <Button variant="ghost" className="text-red-400 hover:text-red-500" onClick={() => {
+                                            if (confirm(t('parent.deleteConfirm'))) store.deleteQuest(quest.id);
+                                        }}>
+                                            <Trash2 size={20} />
+                                        </Button>
                                     </div>
-                                    <Button variant="ghost" className="text-red-400 hover:text-red-500" onClick={() => {
-                                        if (confirm(t('parent.deleteConfirm'))) store.deleteQuest(quest.id);
-                                    }}>
-                                        <Trash2 size={20} />
-                                    </Button>
+
+                                    {/* Once Per Day Toggle */}
+                                    <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                                        <span className="text-xs text-slate-400 mr-auto">
+                                            {t('parent.completionLimit') || (i18n.language === 'ja' ? '完了せいげん:' : 'Limit:')}
+                                        </span>
+                                        <button
+                                            onClick={() => store.updateQuest({ ...quest, oncePerDay: false })}
+                                            className={`px-2 py-1 rounded-lg text-xs font-bold transition-all ${!quest.oncePerDay
+                                                ? 'bg-green-500 text-white'
+                                                : 'bg-slate-100 text-slate-400 hover:bg-green-100'
+                                                }`}
+                                        >
+                                            🔄 {i18n.language === 'ja' ? 'なんかいでも' : 'Unlimited'}
+                                        </button>
+                                        <button
+                                            onClick={() => store.updateQuest({ ...quest, oncePerDay: true })}
+                                            className={`px-2 py-1 rounded-lg text-xs font-bold transition-all ${quest.oncePerDay
+                                                ? 'bg-orange-500 text-white'
+                                                : 'bg-slate-100 text-slate-400 hover:bg-orange-100'
+                                                }`}
+                                        >
+                                            1️⃣ {i18n.language === 'ja' ? '1日1回' : 'Once/day'}
+                                        </button>
+                                    </div>
                                 </Card>
                             ))}
                         </div>

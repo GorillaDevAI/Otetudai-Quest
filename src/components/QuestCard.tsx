@@ -13,17 +13,20 @@ interface QuestCardProps {
 }
 
 export const QuestCard = ({ quest }: QuestCardProps) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const isJa = i18n.language === 'ja';
     const { getQuestTitle } = useLocalizedTitle();
     const addPoints = useStore((state) => state.addPoints);
+    const isQuestCompletedToday = useStore((state) => state.isQuestCompletedToday);
     const [isCompleted, setIsCompleted] = useState(false);
 
     const title = getQuestTitle(quest);
 
-    const handleComplete = () => {
-        if (isCompleted) return;
+    // Check if quest has daily limit and already completed today
+    const alreadyDoneToday = quest.oncePerDay && isQuestCompletedToday(quest.id);
 
-        // Play sound (optional, placeholder for now)
+    const handleComplete = () => {
+        if (isCompleted || alreadyDoneToday) return;
 
         // Trigger visual effects
         setIsCompleted(true);
@@ -32,15 +35,23 @@ export const QuestCard = ({ quest }: QuestCardProps) => {
         // Update state
         addPoints(quest.point, 'quest', quest.id, title);
 
-        // Reset after a while so they can do it again? 
-        // Or keep it checked for the day? 
-        // For now, let's reset it after 3 seconds so it's reusable
-        setTimeout(() => setIsCompleted(false), 3000);
+        // Reset after 3 seconds (unless it's a once-per-day quest)
+        if (!quest.oncePerDay) {
+            setTimeout(() => setIsCompleted(false), 3000);
+        }
     };
 
     return (
-        <Card className="p-4 flex flex-col items-center gap-3 relative overflow-hidden bg-white">
-            {isCompleted && (
+        <Card className={`p-4 flex flex-col items-center gap-3 relative overflow-hidden ${alreadyDoneToday ? 'bg-slate-100 opacity-60' : 'bg-white'
+            }`}>
+            {/* Already done today indicator */}
+            {alreadyDoneToday && (
+                <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    ✓ {isJa ? 'かんりょう' : 'Done'}
+                </div>
+            )}
+
+            {isCompleted && !alreadyDoneToday && (
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -66,7 +77,8 @@ export const QuestCard = ({ quest }: QuestCardProps) => {
                 </motion.div>
             )}
 
-            <div className="text-6xl my-2 select-none group-hover:scale-110 transition-transform">
+            <div className={`text-6xl my-2 select-none group-hover:scale-110 transition-transform ${alreadyDoneToday ? 'grayscale' : ''
+                }`}>
                 {quest.icon}
             </div>
 
@@ -74,6 +86,11 @@ export const QuestCard = ({ quest }: QuestCardProps) => {
                 <h3 className="text-lg font-bold text-slate-700 leading-tight mb-1">
                     {title}
                 </h3>
+                {quest.oncePerDay && (
+                    <div className="text-xs text-orange-500 font-bold mb-1">
+                        1️⃣ {isJa ? '1日1回' : 'Once/day'}
+                    </div>
+                )}
                 <div className="inline-flex items-center gap-1 bg-yellow-100 text-orange-600 px-3 py-1 rounded-full font-black text-lg">
                     <span className="text-yellow-500">🪙</span>
                     {quest.point}
@@ -81,12 +98,15 @@ export const QuestCard = ({ quest }: QuestCardProps) => {
             </div>
 
             <Button
-                variant="primary"
+                variant={alreadyDoneToday ? 'ghost' : 'primary'}
                 className="w-full mt-2"
                 onClick={handleComplete}
-                disabled={isCompleted}
+                disabled={isCompleted || alreadyDoneToday}
             >
-                {t('kid.complete')}
+                {alreadyDoneToday
+                    ? (isJa ? 'おわったよ！' : 'Completed!')
+                    : t('kid.complete')
+                }
             </Button>
         </Card>
     );

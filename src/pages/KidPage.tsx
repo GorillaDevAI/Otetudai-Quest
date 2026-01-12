@@ -1,22 +1,59 @@
 import { useTranslation } from 'react-i18next';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useStore } from '../store/useStore';
 import { QuestCard } from '../components/QuestCard';
 import { Card } from '../components/Card';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
+import { ProfileSelector } from '../components/ProfileSelector';
+import { Users } from 'lucide-react';
+
+// Monthly level system constants
+// Target: 200pt/day × 30 days × 80% = 4800pt for max level
+const MAX_LEVEL = 50;
+const POINTS_FOR_MAX = 4800; // 80% of theoretical max (6000pt)
+const POINTS_PER_LEVEL = Math.floor(POINTS_FOR_MAX / (MAX_LEVEL - 1)); // ~100pt per level
+
+// Helper: Get current month's start timestamp
+const getMonthStart = (): Date => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+};
 
 export const KidPage = () => {
-    const { t } = useTranslation();
-    const currentPoints = useStore((state) => state.currentPoints);
-    const totalPointsEarned = useStore((state) => state.totalPointsEarned);
+    const { t, i18n } = useTranslation();
+    const isJa = i18n.language === 'ja';
+
+    // Get all state from store unconditionally (React hooks rules)
+    const profiles = useStore((state) => state.profiles);
+    const activeProfileId = useStore((state) => state.activeProfileId);
+    const legacyPoints = useStore((state) => state.currentPoints);
+    const legacyHistory = useStore((state) => state.history);
     const quests = useStore((state) => state.quests);
 
-    // Level calculation: Every 200 points = 1 level, max 50
-    const POINTS_PER_LEVEL = 200;
-    const rawLevel = Math.floor(totalPointsEarned / POINTS_PER_LEVEL) + 1;
-    const level = Math.min(rawLevel, 50);
-    const pointsInCurrentLevel = totalPointsEarned % POINTS_PER_LEVEL;
-    const progressPercent = level >= 50 ? 100 : (pointsInCurrentLevel / POINTS_PER_LEVEL) * 100;
+    // Profile-aware state
+    const activeProfile = profiles.find(p => p.id === activeProfileId);
+    const currentPoints = activeProfile?.currentPoints ?? legacyPoints;
+    const history = activeProfile?.history ?? legacyHistory;
+
+    const [isProfileSelectorOpen, setIsProfileSelectorOpen] = useState(false);
+
+    // Calculate monthly points (for level calculation)
+    const monthlyPoints = useMemo(() => {
+        const monthStart = getMonthStart();
+        return history
+            .filter(item => {
+                const itemDate = new Date(item.date);
+                return item.type === 'quest' && itemDate >= monthStart;
+            })
+            .reduce((sum, item) => sum + item.pointDiff, 0);
+    }, [history]);
+
+    // Level calculation: Based on monthly points, resets each month
+    const rawLevel = Math.floor(monthlyPoints / POINTS_PER_LEVEL) + 1;
+    const level = Math.min(rawLevel, MAX_LEVEL);
+    const pointsInCurrentLevel = monthlyPoints % POINTS_PER_LEVEL;
+    const progressPercent = level >= MAX_LEVEL ? 100 : (pointsInCurrentLevel / POINTS_PER_LEVEL) * 100;
 
     // Level titles (every 5 levels)
     const getLevelTitle = (lv: number): string => {
@@ -35,12 +72,8 @@ export const KidPage = () => {
 
     // Hero Image based on level (every 5 levels)
     const getHeroImage = (lv: number): string => {
-        // We will generate these images: 
-        // hero_lv1.png, hero_lv5.png, hero_lv10.png ... hero_lv50.png
-        // Fallback to lower tiers if image doesn't exist yet (logic-wise we map to 1, 5, 10...)
-
         if (lv >= 50) return '/hero_lv50.png';
-        if (lv >= 45) return '/hero_lv45.png'; // Will use lv25 or similar if not ready
+        if (lv >= 45) return '/hero_lv45.png';
         if (lv >= 40) return '/hero_lv40.png';
         if (lv >= 35) return '/hero_lv35.png';
         if (lv >= 30) return '/hero_lv30.png';
@@ -52,12 +85,28 @@ export const KidPage = () => {
         return '/hero_lv1.png';
     };
 
+    // Get current month name
+    const currentMonthName = new Date().toLocaleDateString(isJa ? 'ja-JP' : 'en-US', { month: 'long' });
+
     return (
         <div className="min-h-screen bg-blue-50">
             {/* Header */}
             <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b-2 border-blue-100 p-4 shadow-sm">
                 <div className="max-w-md mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-2">
+                        {/* Profile Switcher */}
+                        {profiles.length > 0 && (
+                            <button
+                                onClick={() => setIsProfileSelectorOpen(true)}
+                                className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-2 rounded-xl shadow-md hover:shadow-lg transition-all"
+                            >
+                                <span className="text-xl">{activeProfile?.icon || '🦸'}</span>
+                                <span className="font-bold text-sm max-w-[60px] truncate">
+                                    {activeProfile?.name || 'ゆうしゃ'}
+                                </span>
+                                {profiles.length > 1 && <Users size={14} />}
+                            </button>
+                        )}
                         <div className="bg-yellow-400 p-2 rounded-xl text-2xl shadow-inner border-2 border-yellow-500">
                             🪙
                         </div>
@@ -79,11 +128,15 @@ export const KidPage = () => {
 
                 {/* Progress / Level with Hero */}
                 <Card variant="colorful" className="p-4 relative overflow-hidden">
+                    {/* Monthly Reset Badge */}
+                    <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                        📅 {currentMonthName}
+                    </div>
+
                     <div className="flex items-center gap-4">
                         <img
                             src={getHeroImage(level)}
                             onError={(e) => {
-                                // Fallback to lv1 if specific level image missing
                                 e.currentTarget.src = '/hero_lv1.png';
                             }}
                             alt="Hero"
@@ -100,9 +153,17 @@ export const KidPage = () => {
                                     transition={{ duration: 0.5 }}
                                 />
                             </div>
-                            <p className="text-xs text-blue-500 mt-1">
-                                {t('kid.nextLevel', { points: POINTS_PER_LEVEL - pointsInCurrentLevel })}
-                            </p>
+                            <div className="flex justify-between text-xs mt-1">
+                                <span className="text-blue-500">
+                                    {level < MAX_LEVEL
+                                        ? t('kid.nextLevel', { points: POINTS_PER_LEVEL - pointsInCurrentLevel })
+                                        : (isJa ? '🎉 さいこうレベル！' : '🎉 Max Level!')
+                                    }
+                                </span>
+                                <span className="text-slate-400">
+                                    {isJa ? `今月: ${monthlyPoints}pt` : `This month: ${monthlyPoints}pt`}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </Card>
@@ -120,6 +181,12 @@ export const KidPage = () => {
                 </div>
 
             </main>
+
+            {/* Profile Selector Modal */}
+            <ProfileSelector
+                isOpen={isProfileSelectorOpen}
+                onClose={() => setIsProfileSelectorOpen(false)}
+            />
         </div>
     );
 };

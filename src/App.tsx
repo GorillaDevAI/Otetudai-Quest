@@ -48,11 +48,18 @@ function App() {
 
     const userAnswer = prompt(promptMessage);
 
-    if (userAnswer !== null && parseInt(userAnswer) === problem.answer) {
-      setIsParentMode(true);
-    } else if (userAnswer !== null) {
-      const errorMessage = isJa ? 'ざんねん！こたえがちがうよ' : 'Oops! Wrong answer';
-      alert(errorMessage);
+    if (userAnswer !== null) {
+      // Convert full-width numbers to half-width (for Japanese IME users)
+      const normalizedAnswer = userAnswer
+        .replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
+        .trim();
+
+      if (parseInt(normalizedAnswer, 10) === problem.answer) {
+        setIsParentMode(true);
+      } else {
+        const errorMessage = isJa ? 'ざんねん！こたえがちがうよ' : 'Oops! Wrong answer';
+        alert(errorMessage);
+      }
     }
   };
 

@@ -9,9 +9,17 @@ type ViewMode = 'day' | 'month' | 'year';
 
 export const HistoryPage = () => {
     const { t, i18n } = useTranslation();
-    const history = useStore((state) => state.history);
+
+    // Get all state from store (unconditionally to respect React hooks rules)
+    const profiles = useStore((state) => state.profiles);
+    const activeProfileId = useStore((state) => state.activeProfileId);
+    const legacyHistory = useStore((state) => state.history);
     const quests = useStore((state) => state.quests);
     const rewards = useStore((state) => state.rewards);
+
+    // Profile-aware history: use active profile's history if available, else legacy
+    const activeProfile = profiles.find(p => p.id === activeProfileId);
+    const history = activeProfile?.history ?? legacyHistory;
 
     const [viewMode, setViewMode] = useState<ViewMode>('day');
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -52,9 +60,6 @@ export const HistoryPage = () => {
 
         const dailyTotals = new Array(daysInMonth).fill(0);
 
-        console.log('--- Month Aggregation Debug ---');
-        console.log('Current Filter:', { year, month });
-
         history.forEach(item => {
             const itemDate = new Date(item.date);
             const isQuest = item.type === 'quest';
@@ -64,18 +69,11 @@ export const HistoryPage = () => {
             if (isQuest && isYearMatch && isMonthMatch) {
                 const day = itemDate.getDate(); // 1-31
                 const index = day - 1; // 0-30
-                console.log(`Matching Item: ${item.date} -> Day ${day} (+${item.pointDiff})`);
                 if (index >= 0 && index < daysInMonth) {
                     dailyTotals[index] += item.pointDiff;
                 }
-            } else {
-                // Log why it failed only for recent items
-                // console.log(`Skipping: ${item.date} (Quest:${isQuest} Y:${isYearMatch} M:${isMonthMatch})`);
             }
         });
-
-        // Debug: Check if today's data is included
-        // console.log('Month Data:', dailyTotals);
 
         return dailyTotals.map((total, idx) => ({ day: idx + 1, total }));
     }, [history, currentDate]);
@@ -206,26 +204,29 @@ export const HistoryPage = () => {
                         <h3 className="font-bold text-slate-500 mb-4 flex items-center gap-2">
                             <BarChart3 size={18} /> Daily Points
                         </h3>
-                        <div className="flex items-end h-60 gap-1 overflow-x-auto pb-6">
+                        <div className="flex items-end h-60 gap-2 overflow-x-auto pb-6 px-2">
                             {monthData.map((d) => {
                                 const maxVal = Math.max(...monthData.map(m => m.total), 1);
                                 const heightPercent = (d.total / maxVal) * 100;
+                                const isToday = d.day === currentDate.getDate() && viewMode === 'month';
+
                                 return (
-                                    <div key={d.day} className="flex-1 min-w-[20px] flex flex-col items-center group relative">
+                                    <div key={d.day} className="flex-1 min-w-[24px] flex flex-col items-center group relative cursor-pointer">
                                         {/* Bar */}
                                         <div
-                                            className="w-full bg-blue-200 rounded-t-sm group-hover:bg-blue-400 transition-all relative"
-                                            style={{ height: `${heightPercent}%` }}
+                                            className={`w-full rounded-t-sm transition-all relative ${isToday ? 'bg-orange-400' : 'bg-blue-300 group-hover:bg-blue-400'
+                                                }`}
+                                            style={{ height: `${heightPercent}%`, minHeight: d.total > 0 ? '4px' : '0' }}
                                         >
                                             {d.total > 0 && (
-                                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold bg-slate-800 text-white px-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                                    {d.total}pt
+                                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold bg-slate-800 text-white px-1 rounded opacity-100 whitespace-nowrap z-10">
+                                                    {d.total}
                                                 </div>
                                             )}
                                         </div>
                                         {/* Label */}
-                                        <div className="text-[10px] text-slate-400 mt-1 absolute -bottom-4">
-                                            {d.day % 5 === 1 ? d.day : ''}
+                                        <div className={`text-[10px] mt-1 absolute -bottom-4 font-bold ${isToday ? 'text-orange-500' : 'text-slate-400'}`}>
+                                            {d.day}
                                         </div>
                                     </div>
                                 );
@@ -240,20 +241,20 @@ export const HistoryPage = () => {
                         <h3 className="font-bold text-slate-500 mb-4 flex items-center gap-2">
                             <BarChart3 size={18} /> Monthly Points
                         </h3>
-                        <div className="flex items-end h-60 gap-2">
+                        <div className="flex items-end h-60 gap-2 overflow-x-auto px-2">
                             {yearData.map((m) => {
                                 const maxVal = Math.max(...yearData.map(y => y.total), 1);
                                 const heightPercent = (m.total / maxVal) * 100;
                                 return (
-                                    <div key={m.month} className="flex-1 flex flex-col items-center group relative">
+                                    <div key={m.month} className="flex-1 min-w-[30px] flex flex-col items-center group relative">
                                         {/* Bar */}
                                         <div
-                                            className="w-full bg-indigo-200 rounded-t-md group-hover:bg-indigo-400 transition-all relative"
-                                            style={{ height: `${heightPercent}%` }}
+                                            className="w-full bg-indigo-300 rounded-t-md group-hover:bg-indigo-400 transition-all relative"
+                                            style={{ height: `${heightPercent}%`, minHeight: m.total > 0 ? '4px' : '0' }}
                                         >
                                             {m.total > 0 && (
-                                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold bg-slate-800 text-white px-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                                    {m.total}pt
+                                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold bg-slate-800 text-white px-1 rounded opacity-100 whitespace-nowrap z-10">
+                                                    {m.total}
                                                 </div>
                                             )}
                                         </div>

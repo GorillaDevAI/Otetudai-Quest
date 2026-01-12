@@ -89,7 +89,8 @@
         "addRewardName": "ごほうびのなまえ (例: ゲーム1じかん)",
         "addRewardCost": "ひつようなポイント (例: 500)",
         "addRewardIcon": "アイコンの絵文字 (例: 🎮)",
-        "numberError": "ポイントは数字でいれてね"
+        "numberError": "ポイントは数字でいれてね",
+        "completionLimit": "完了せいげん:"
     },
     "auth": {
         "enterPassword": "パスワードを入れてね (1234)"

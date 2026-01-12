@@ -2,29 +2,32 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from './Button';
 import { Modal } from './Modal';
-// No AppState import needed
 
 interface AddItemModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (title: string, point: number, icon: string) => void;
+    onSave: (title: string, point: number, icon: string, oncePerDay?: boolean) => void;
     type: 'quest' | 'reward';
 }
 
 const POINT_OPTIONS = [10, 30, 50, 100, 300];
 
 export const AddItemModal = ({ isOpen, onClose, onSave, type }: AddItemModalProps) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const isJa = i18n.language === 'ja';
+
     const [title, setTitle] = useState('');
     const [point, setPoint] = useState(10);
     const [icon, setIcon] = useState(type === 'quest' ? '📝' : '🎁');
+    const [oncePerDay, setOncePerDay] = useState(false);
 
     const handleSubmit = () => {
         if (!title.trim()) return;
-        onSave(title, point, icon);
+        onSave(title, point, icon, type === 'quest' ? oncePerDay : undefined);
         setTitle('');
         setPoint(10);
         setIcon(type === 'quest' ? '📝' : '🎁');
+        setOncePerDay(false);
         onClose();
     };
 
@@ -88,6 +91,35 @@ export const AddItemModal = ({ isOpen, onClose, onSave, type }: AddItemModalProp
                         </div>
                     </div>
                 </div>
+
+                {/* Once Per Day Toggle (Quest only) */}
+                {type === 'quest' && (
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-slate-500">
+                            {isJa ? '完了せいげん' : 'Completion Limit'}
+                        </label>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setOncePerDay(false)}
+                                className={`flex-1 p-3 rounded-xl border-2 font-bold text-sm transition-all ${!oncePerDay
+                                        ? 'bg-green-500 border-green-600 text-white shadow-md'
+                                        : 'bg-white border-slate-200 text-slate-400 hover:border-green-200'
+                                    }`}
+                            >
+                                {isJa ? '🔄 なんかいでもOK' : '🔄 Unlimited'}
+                            </button>
+                            <button
+                                onClick={() => setOncePerDay(true)}
+                                className={`flex-1 p-3 rounded-xl border-2 font-bold text-sm transition-all ${oncePerDay
+                                        ? 'bg-orange-500 border-orange-600 text-white shadow-md'
+                                        : 'bg-white border-slate-200 text-slate-400 hover:border-orange-200'
+                                    }`}
+                            >
+                                {isJa ? '1️⃣ 1日1回まで' : '1️⃣ Once per day'}
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 <Button
                     variant="primary"

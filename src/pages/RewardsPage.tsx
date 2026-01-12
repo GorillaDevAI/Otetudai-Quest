@@ -6,8 +6,16 @@ import { LanguageSwitcher } from '../components/LanguageSwitcher';
 
 export const RewardsPage = () => {
     const { t } = useTranslation();
-    const currentPoints = useStore((state) => state.currentPoints);
+
+    // Get all state from store unconditionally
+    const profiles = useStore((state) => state.profiles);
+    const activeProfileId = useStore((state) => state.activeProfileId);
+    const legacyPoints = useStore((state) => state.currentPoints);
     const rewards = useStore((state) => state.rewards);
+
+    // Profile-aware points
+    const activeProfile = profiles.find(p => p.id === activeProfileId);
+    const currentPoints = activeProfile?.currentPoints ?? legacyPoints;
 
     return (
         <div className="min-h-screen bg-pink-50">

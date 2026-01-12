@@ -89,7 +89,8 @@
         "addRewardName": "Reward name (e.g., 1 hour of gaming)",
         "addRewardCost": "Points needed (e.g., 500)",
         "addRewardIcon": "Icon emoji (e.g., 🎮)",
-        "numberError": "Please enter a number"
+        "numberError": "Please enter a number",
+        "completionLimit": "Limit:"
     },
     "auth": {
         "enterPassword": "Enter password (1234)"
