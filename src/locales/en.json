@@ -2,7 +2,24 @@
     "common": {
         "points": "pt",
         "currentPoints": "Current Points",
-        "settings": "Settings"
+        "settings": "Settings",
+        "day": "Day",
+        "month": "Month",
+        "year": "Year",
+        "next": "Next",
+        "start": "Start!"
+    },
+    "welcome": {
+        "title": "Welcome to Otetsudai Quest!",
+        "subtitle": "Help out, earn points, and level up!",
+        "step1": "Choose your language",
+        "step2Title": "How to Play",
+        "step2Desc1": "Help your parents and earn points!",
+        "step2Desc2": "Exchange points for awesome rewards!",
+        "step2Desc3": "Become a Legendary Hero!",
+        "step3Title": "Ready?",
+        "step3Desc": "We've prepared some quests and rewards for you. You can change them later.",
+        "letsGo": "Let's Adventure!"
     },
     "kid": {
         "todayQuests": "Today's Quests",
@@ -10,7 +27,8 @@
         "complete": "Done!",
         "congratulations": "Great job!",
         "pointsGet": "+{{points}}pt earned!",
-        "nextLevel": "{{points}}pt to next level"
+        "nextLevel": "{{points}}pt to next level",
+        "noHistory": "No records yet!"
     },
     "level": {
         "title": "Lv.{{level}}",

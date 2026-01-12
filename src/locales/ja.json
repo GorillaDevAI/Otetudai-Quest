@@ -2,7 +2,24 @@
     "common": {
         "points": "pt",
         "currentPoints": "いまのポイント",
-        "settings": "設定"
+        "settings": "設定",
+        "day": "日",
+        "month": "月",
+        "year": "年",
+        "next": "つぎへ",
+        "start": "はじめる！"
+    },
+    "welcome": {
+        "title": "お手伝いクエストへようこそ！",
+        "subtitle": "楽しくお手伝いをして、レベルアップしよう！",
+        "step1": "まずはことばをえらんでね",
+        "step2Title": "どうやってあそぶの？",
+        "step2Desc1": "おうちのひとのお手伝いをして、ポイントをもらおう！",
+        "step2Desc2": "ポイントがたまると、ごほうびと交換できるよ！",
+        "step2Desc3": "たくさんお手伝いして、伝説の勇者をめざそう！",
+        "step3Title": "じゅんびはいい？",
+        "step3Desc": "最初のお手伝いとごほうびを用意したよ。あとで自由に変えられるから安心してね。",
+        "letsGo": "冒険に出発だ！"
     },
     "kid": {
         "todayQuests": "今日のクエスト",
@@ -10,7 +27,8 @@
         "complete": "できた！",
         "congratulations": "やったね！",
         "pointsGet": "+{{points}}pt ゲット！",
-        "nextLevel": "つぎのレベルまで あと {{points}}pt"
+        "nextLevel": "つぎのレベルまで あと {{points}}pt",
+        "noHistory": "まだきろくがないよ！"
     },
     "level": {
         "title": "Lv.{{level}}",

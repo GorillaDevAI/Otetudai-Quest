@@ -5,6 +5,8 @@ import { ParentPage } from './pages/ParentPage';
 import { HistoryPage } from './pages/HistoryPage';
 import { RewardsPage } from './pages/RewardsPage';
 import { BottomNav } from './components/BottomNav';
+import { WelcomeWizard } from './components/WelcomeWizard';
+import { useStore } from './store/useStore';
 
 type TabType = 'home' | 'rewards' | 'history' | 'settings';
 
@@ -34,6 +36,7 @@ function App() {
   const { i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [isParentMode, setIsParentMode] = useState(false);
+  const isFirstLaunch = useStore((state) => state.isFirstLaunch);
 
   const handleSettingsClick = () => {
     const problem = generateMathProblem();
@@ -61,18 +64,21 @@ function App() {
     }
   };
 
-  // Parent mode is a separate full-screen view
-  if (isParentMode) {
-    return <ParentPage onSwitchMode={() => setIsParentMode(false)} />;
-  }
-
   return (
     <div className="pb-20">
-      {activeTab === 'home' && <KidPage />}
-      {activeTab === 'rewards' && <RewardsPage />}
-      {activeTab === 'history' && <HistoryPage />}
+      {isFirstLaunch && <WelcomeWizard />}
 
-      <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
+      {isParentMode ? (
+        <ParentPage onSwitchMode={() => setIsParentMode(false)} />
+      ) : (
+        <>
+          {activeTab === 'home' && <KidPage />}
+          {activeTab === 'rewards' && <RewardsPage />}
+          {activeTab === 'history' && <HistoryPage />}
+
+          <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
+        </>
+      )}
     </div>
   );
 }

@@ -42,6 +42,10 @@ export interface AppState {
     updateReward: (reward: Reward) => void;
     deleteReward: (id: string) => void;
 
+    // Onboarding
+    isFirstLaunch: boolean;
+    completeOnboarding: () => void;
+
     // Backup/Restore
     importData: (data: Partial<AppState>) => void;
     resetData: () => void;

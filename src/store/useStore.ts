@@ -25,6 +25,9 @@ export const useStore = create<AppState>()(
             quests: DEFAULT_QUESTS,
             rewards: DEFAULT_REWARDS,
             history: [],
+            isFirstLaunch: true,
+
+            completeOnboarding: () => set({ isFirstLaunch: false }),
 
             addPoints: (amount, type, itemId, itemTitle) => {
                 set((state) => ({
