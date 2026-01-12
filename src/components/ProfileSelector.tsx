@@ -76,34 +76,39 @@ export const ProfileSelector = ({ isOpen, onClose }: ProfileSelectorProps) => {
                             >
                                 {editingId === profile.id ? (
                                     // Edit Mode
-                                    <div className="flex-1 flex items-center gap-2">
-                                        <div className="flex gap-1">
+                                    // Edit Mode
+                                    <div className="flex-1 flex flex-col gap-2">
+                                        <div className="flex gap-1 justify-center flex-wrap">
                                             {AVAILABLE_AVATARS.map((emoji) => (
                                                 <button
                                                     key={emoji}
                                                     onClick={() => setNewIcon(emoji)}
-                                                    className={`text-2xl p-1 rounded ${newIcon === emoji ? 'bg-blue-200' : 'hover:bg-slate-100'
+                                                    className={`text-2xl p-1 rounded-lg transition-transform ${newIcon === emoji
+                                                        ? 'bg-blue-200 scale-110 shadow-sm'
+                                                        : 'hover:bg-slate-100'
                                                         }`}
                                                 >
                                                     {emoji}
                                                 </button>
                                             ))}
                                         </div>
-                                        <input
-                                            type="text"
-                                            value={newName}
-                                            onChange={(e) => setNewName(e.target.value)}
-                                            className="flex-1 p-2 border rounded-lg text-sm font-bold"
-                                            maxLength={10}
-                                            autoFocus
-                                        />
-                                        <Button
-                                            variant="primary"
-                                            size="sm"
-                                            onClick={() => handleUpdateProfile(profile.id)}
-                                        >
-                                            <Check size={16} />
-                                        </Button>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={newName}
+                                                onChange={(e) => setNewName(e.target.value)}
+                                                className="flex-1 p-2 border rounded-lg text-sm font-bold"
+                                                maxLength={10}
+                                                autoFocus
+                                            />
+                                            <Button
+                                                variant="primary"
+                                                size="sm"
+                                                onClick={() => handleUpdateProfile(profile.id)}
+                                            >
+                                                <Check size={16} />
+                                            </Button>
+                                        </div>
                                     </div>
                                 ) : (
                                     // View Mode

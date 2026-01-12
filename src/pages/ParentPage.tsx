@@ -4,7 +4,8 @@ import { useStore } from '../store/useStore';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { AddItemModal } from '../components/AddItemModal';
-import { ArrowLeft, Upload, Download, Trash2, Plus } from 'lucide-react';
+import { ArrowLeft, Upload, Download, Trash2, Plus, Pencil } from 'lucide-react';
+import { type Quest, type Reward } from '../types';
 
 import { useLocalizedTitle } from '../lib/useLocalizedTitle';
 
@@ -14,6 +15,8 @@ export const ParentPage = ({ onSwitchMode }: { onSwitchMode: () => void }) => {
     const store = useStore();
     const [activeTab, setActiveTab] = useState<'quests' | 'rewards' | 'data'>('quests');
     const [addItemType, setAddItemType] = useState<'quest' | 'reward' | null>(null);
+    const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
+    const [editingReward, setEditingReward] = useState<Reward | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleExport = () => {
@@ -60,15 +63,36 @@ export const ParentPage = ({ onSwitchMode }: { onSwitchMode: () => void }) => {
     };
 
     const handleSaveItem = (title: string, point: number, icon: string, oncePerDay?: boolean) => {
-        if (addItemType === 'quest') {
+        if (editingQuest) {
+            // Update existing quest
+            store.updateQuest({
+                ...editingQuest,
+                title,
+                point,
+                icon,
+                oncePerDay: oncePerDay || false,
+            });
+            setEditingQuest(null);
+        } else if (editingReward) {
+            // Update existing reward
+            store.updateReward({
+                ...editingReward,
+                title,
+                cost: point,
+                icon,
+            });
+            setEditingReward(null);
+        } else if (addItemType === 'quest') {
+            // Add new quest
             store.addQuest({
                 id: crypto.randomUUID(),
-                title, // Default Japanese/Fallback title
+                title,
                 point,
                 icon,
                 oncePerDay: oncePerDay || false,
             });
         } else if (addItemType === 'reward') {
+            // Add new reward
             store.addReward({
                 id: crypto.randomUUID(),
                 title,
@@ -77,6 +101,16 @@ export const ParentPage = ({ onSwitchMode }: { onSwitchMode: () => void }) => {
             });
         }
     };
+
+    const handleCloseModal = () => {
+        setAddItemType(null);
+        setEditingQuest(null);
+        setEditingReward(null);
+    };
+
+    const isModalOpen = !!addItemType || !!editingQuest || !!editingReward;
+    const modalType = editingQuest ? 'quest' : editingReward ? 'reward' : addItemType || 'quest';
+    const editItem = editingQuest || editingReward || null;
 
 
     return (
@@ -125,10 +159,16 @@ export const ParentPage = ({ onSwitchMode }: { onSwitchMode: () => void }) => {
                             {store.quests.map((quest) => (
                                 <Card key={quest.id} className="p-4 bg-white">
                                     <div className="flex items-center justify-between mb-3">
-                                        <div className="flex items-center gap-3">
+                                        <div
+                                            className="flex items-center gap-3 flex-1 cursor-pointer hover:opacity-70 transition-opacity"
+                                            onClick={() => setEditingQuest(quest)}
+                                        >
                                             <span className="text-3xl">{quest.icon}</span>
                                             <div>
-                                                <div className="font-bold">{getQuestTitle(quest)}</div>
+                                                <div className="font-bold flex items-center gap-1">
+                                                    {getQuestTitle(quest)}
+                                                    <Pencil size={14} className="text-slate-400" />
+                                                </div>
                                                 <div className="text-sm font-bold text-orange-500">🪙 {quest.point}pt</div>
                                             </div>
                                         </div>
@@ -179,10 +219,16 @@ export const ParentPage = ({ onSwitchMode }: { onSwitchMode: () => void }) => {
                             </div>
                             {store.rewards.map((reward) => (
                                 <Card key={reward.id} className="p-4 flex items-center justify-between bg-white">
-                                    <div className="flex items-center gap-3">
+                                    <div
+                                        className="flex items-center gap-3 flex-1 cursor-pointer hover:opacity-70 transition-opacity"
+                                        onClick={() => setEditingReward(reward)}
+                                    >
                                         <span className="text-3xl">{reward.icon}</span>
                                         <div>
-                                            <div className="font-bold">{getRewardTitle(reward)}</div>
+                                            <div className="font-bold flex items-center gap-1">
+                                                {getRewardTitle(reward)}
+                                                <Pencil size={14} className="text-slate-400" />
+                                            </div>
                                             <div className="text-sm font-bold text-orange-500">🪙 {reward.cost}pt</div>
                                         </div>
                                     </div>
@@ -247,10 +293,11 @@ export const ParentPage = ({ onSwitchMode }: { onSwitchMode: () => void }) => {
             </main>
 
             <AddItemModal
-                isOpen={!!addItemType}
-                onClose={() => setAddItemType(null)}
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
                 onSave={handleSaveItem}
-                type={addItemType || 'quest'}
+                type={modalType}
+                editItem={editItem}
             />
         </div>
     );

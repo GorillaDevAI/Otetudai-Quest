@@ -4,6 +4,7 @@ import { type Quest } from '../types';
 import { Card } from './Card';
 import { Button } from './Button';
 import { triggerConfetti } from '../lib/confetti';
+import { playSuccessSound } from '../lib/sounds';
 import { useStore } from '../store/useStore';
 import { useLocalizedTitle } from '../lib/useLocalizedTitle';
 import { useState } from 'react';
@@ -27,6 +28,9 @@ export const QuestCard = ({ quest }: QuestCardProps) => {
 
     const handleComplete = () => {
         if (isCompleted || alreadyDoneToday) return;
+
+        // Play sound effect
+        playSuccessSound();
 
         // Trigger visual effects
         setIsCompleted(true);

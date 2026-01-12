@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Calendar, ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, BarChart3, Trash2 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { Card } from '../components/Card';
 
@@ -16,6 +16,8 @@ export const HistoryPage = () => {
     const legacyHistory = useStore((state) => state.history);
     const quests = useStore((state) => state.quests);
     const rewards = useStore((state) => state.rewards);
+    const deleteHistoryItem = useStore((state) => state.deleteHistoryItem);
+    const deleteHistoryByDate = useStore((state) => state.deleteHistoryByDate);
 
     // Profile-aware history: use active profile's history if available, else legacy
     const activeProfile = profiles.find(p => p.id === activeProfileId);
@@ -38,6 +40,11 @@ export const HistoryPage = () => {
             return reward?.title || 'ごほうび';
         }
         return '';
+    };
+
+    // Helper: format date as YYYY-MM-DD
+    const formatDateStr = (date: Date): string => {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     };
 
     // --- DATA AGGREGATION ---
@@ -121,6 +128,24 @@ export const HistoryPage = () => {
         return currentDate.getFullYear().toString();
     };
 
+    // --- DELETE HANDLERS ---
+    const handleDeleteItem = (itemId: string) => {
+        const confirmMsg = isJa ? 'この記録を削除しますか？ポイントも取り消されます。' : 'Delete this record? Points will be reversed.';
+        if (confirm(confirmMsg)) {
+            deleteHistoryItem(itemId);
+        }
+    };
+
+    const handleDeleteDayRecords = () => {
+        const dateStr = formatDateStr(currentDate);
+        const confirmMsg = isJa
+            ? `${getHeaderLabel()}の記録をすべて削除しますか？ポイントも取り消されます。`
+            : `Delete all records for ${getHeaderLabel()}? Points will be reversed.`;
+        if (confirm(confirmMsg)) {
+            deleteHistoryByDate(dateStr);
+        }
+    };
+
 
     return (
         <div className="min-h-screen bg-slate-50 pb-28">
@@ -165,6 +190,17 @@ export const HistoryPage = () => {
                 {/* --- DAY VIEW --- */}
                 {viewMode === 'day' && (
                     <div className="space-y-3">
+                        {/* Delete All Day Records Button */}
+                        {dayData.length > 0 && (
+                            <button
+                                onClick={handleDeleteDayRecords}
+                                className="w-full flex items-center justify-center gap-2 p-2 bg-red-50 text-red-500 rounded-xl border-2 border-red-200 hover:bg-red-100 transition-colors text-sm font-bold"
+                            >
+                                <Trash2 size={16} />
+                                {isJa ? 'この日の記録をすべて削除' : 'Delete all records for this day'}
+                            </button>
+                        )}
+
                         {dayData.length === 0 ? (
                             <Card className="p-8 text-center text-slate-400 bg-white border-dashed">
                                 <p>{t('kid.noHistory')}</p>
@@ -189,8 +225,16 @@ export const HistoryPage = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className={`font-black ${item.pointDiff > 0 ? 'text-green-500' : 'text-red-400'}`}>
-                                        {item.pointDiff > 0 ? '+' : ''}{item.pointDiff}pt
+                                    <div className="flex items-center gap-2">
+                                        <div className={`font-black ${item.pointDiff > 0 ? 'text-green-500' : 'text-red-400'}`}>
+                                            {item.pointDiff > 0 ? '+' : ''}{item.pointDiff}pt
+                                        </div>
+                                        <button
+                                            onClick={() => handleDeleteItem(item.id)}
+                                            className="p-1 text-slate-300 hover:text-red-500 transition-colors"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
                                     </div>
                                 </motion.div>
                             ))

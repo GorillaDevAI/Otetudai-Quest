@@ -5,6 +5,14 @@ export interface Quest {
     point: number;
     icon: string;       // Icon identifier
     oncePerDay?: boolean; // Optional: limit to once per day
+    mustShow?: boolean;   // Always show this quest (e.g., homework)
+}
+
+// Daily quest selection state (per profile)
+export interface DailyQuestState {
+    date: string;           // Date string (YYYY-MM-DD)
+    selectedQuestIds: string[]; // Currently displayed quest IDs
+    resetCount: number;     // Number of resets today (max 2)
 }
 
 export interface Reward {
@@ -47,6 +55,9 @@ export interface AppState {
     quests: Quest[];
     rewards: Reward[];
 
+    // Daily quest state per profile
+    dailyQuestStates: { [profileId: string]: DailyQuestState };
+
     // Legacy single-profile fields (for backward compatibility)
     currentPoints: number;
     totalPointsEarned: number;
@@ -69,10 +80,19 @@ export interface AppState {
     deleteQuest: (id: string) => void;
     isQuestCompletedToday: (questId: string) => boolean;
 
+    // Daily Quest Selection Actions
+    getDailyQuests: () => Quest[];
+    resetDailyQuests: () => boolean; // Returns false if already reset 2 times today
+    getRemainingResets: () => number;
+
     // Reward Actions
     addReward: (reward: Reward) => void;
     updateReward: (reward: Reward) => void;
     deleteReward: (id: string) => void;
+
+    // History Actions (for parent control)
+    deleteHistoryItem: (historyId: string) => void;
+    deleteHistoryByDate: (dateStr: string) => void; // Date in YYYY-MM-DD format
 
     // Onboarding
     isFirstLaunch: boolean;
