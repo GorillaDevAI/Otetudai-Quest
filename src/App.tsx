@@ -1,66 +1,30 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { KidPage } from './pages/KidPage';
 import { ParentPage } from './pages/ParentPage';
 import { HistoryPage } from './pages/HistoryPage';
 import { RewardsPage } from './pages/RewardsPage';
 import { BottomNav } from './components/BottomNav';
 import { WelcomeWizard } from './components/WelcomeWizard';
+import { TutorialOverlay } from './components/TutorialOverlay';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
+import { ParentGate } from './components/ParentGate';
 import { useStore } from './store/useStore';
 
 type TabType = 'home' | 'rewards' | 'history' | 'settings';
 
-// Generate a random math problem for parent authentication
-const generateMathProblem = () => {
-  const num1 = Math.floor(Math.random() * 9) + 1; // 1-9
-  const num2 = Math.floor(Math.random() * 9) + 1; // 1-9
-  const isAddition = Math.random() > 0.5;
-
-  if (isAddition) {
-    return {
-      question: `${num1} + ${num2} = ?`,
-      answer: num1 + num2,
-    };
-  } else {
-    // Ensure result is positive
-    const larger = Math.max(num1, num2);
-    const smaller = Math.min(num1, num2);
-    return {
-      question: `${larger} - ${smaller} = ?`,
-      answer: larger - smaller,
-    };
-  }
-};
-
 function App() {
-  const { i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [isParentMode, setIsParentMode] = useState(false);
+  const [showParentGate, setShowParentGate] = useState(false);
   const isFirstLaunch = useStore((state) => state.isFirstLaunch);
 
   const handleSettingsClick = () => {
-    const problem = generateMathProblem();
-    const isJa = i18n.language === 'ja';
+    setShowParentGate(true);
+  };
 
-    const promptMessage = isJa
-      ? `おとなようです！\nこたえをいれてね: ${problem.question}`
-      : `For adults only!\nSolve: ${problem.question}`;
-
-    const userAnswer = prompt(promptMessage);
-
-    if (userAnswer !== null) {
-      // Convert full-width numbers to half-width (for Japanese IME users)
-      const normalizedAnswer = userAnswer
-        .replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
-        .trim();
-
-      if (parseInt(normalizedAnswer, 10) === problem.answer) {
-        setIsParentMode(true);
-      } else {
-        const errorMessage = isJa ? 'ざんねん！こたえがちがうよ' : 'Oops! Wrong answer';
-        alert(errorMessage);
-      }
-    }
+  const handleParentGateSuccess = () => {
+    setShowParentGate(false);
+    setIsParentMode(true);
   };
 
   const handleTabChange = (tab: TabType) => {
@@ -74,6 +38,14 @@ function App() {
   return (
     <div className="pb-20">
       {isFirstLaunch && <WelcomeWizard />}
+      <TutorialOverlay />
+
+      {/* Parent Gate Modal */}
+      <ParentGate
+        isOpen={showParentGate}
+        onSuccess={handleParentGateSuccess}
+        onClose={() => setShowParentGate(false)}
+      />
 
       {isParentMode ? (
         <ParentPage onSwitchMode={() => setIsParentMode(false)} />
@@ -83,6 +55,7 @@ function App() {
           {activeTab === 'rewards' && <RewardsPage />}
           {activeTab === 'history' && <HistoryPage />}
 
+          <PWAInstallPrompt />
           <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
         </>
       )}

@@ -98,6 +98,10 @@ export interface AppState {
     isFirstLaunch: boolean;
     completeOnboarding: () => void;
 
+    // Post-onboarding tutorial
+    showTutorial: boolean;
+    completeTutorial: () => void;
+
     // Backup/Restore
     importData: (data: Partial<AppState>) => void;
     resetData: () => void;

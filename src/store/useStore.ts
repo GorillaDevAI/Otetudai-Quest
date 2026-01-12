@@ -68,6 +68,7 @@ export const useStore = create<AppState>()(
             history: [],
 
             isFirstLaunch: true,
+            showTutorial: false,
 
             completeOnboarding: () => {
                 const state = get();
@@ -76,12 +77,17 @@ export const useStore = create<AppState>()(
                     const defaultProfile = createDefaultProfile();
                     set({
                         isFirstLaunch: false,
+                        showTutorial: true, // Show tutorial after onboarding
                         profiles: [defaultProfile],
                         activeProfileId: defaultProfile.id,
                     });
                 } else {
-                    set({ isFirstLaunch: false });
+                    set({ isFirstLaunch: false, showTutorial: true });
                 }
+            },
+
+            completeTutorial: () => {
+                set({ showTutorial: false });
             },
 
             // Profile Management

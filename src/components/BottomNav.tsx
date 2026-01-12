@@ -31,9 +31,10 @@ export const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
                             key={tab.id}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => onTabChange(tab.id)}
+                            data-tutorial={tab.id === 'settings' ? 'settings-button' : undefined}
                             className={`flex flex-col items-center justify-center gap-0.5 px-4 py-2 rounded-xl transition-colors ${isActive
-                                    ? 'text-blue-600'
-                                    : 'text-slate-400 hover:text-slate-600'
+                                ? 'text-blue-600'
+                                : 'text-slate-400 hover:text-slate-600'
                                 }`}
                         >
                             <div className="relative">

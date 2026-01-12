@@ -94,5 +94,18 @@
     },
     "auth": {
         "enterPassword": "Enter password (1234)"
+    },
+    "tutorial": {
+        "step1Title": "Select Your Profile!",
+        "step1Desc": "Tap here to switch profiles or add new ones",
+        "step2Title": "Go to Settings!",
+        "step2Desc": "Tap here to add or edit quests and rewards in the settings screen",
+        "step3Title": "Add Quests!",
+        "step3Desc": "Use this + button to add new quests",
+        "step4Title": "Add Rewards Too!",
+        "step4Desc": "Switch to the rewards tab to add rewards the same way",
+        "next": "Next",
+        "finish": "Let's Start!",
+        "skip": "Skip"
     }
 }

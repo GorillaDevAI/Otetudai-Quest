@@ -101,6 +101,7 @@ export const KidPage = () => {
                         {profiles.length > 0 && (
                             <button
                                 onClick={() => setIsProfileSelectorOpen(true)}
+                                data-tutorial="profile-button"
                                 className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-2 rounded-xl shadow-md hover:shadow-lg transition-all"
                             >
                                 <span className="text-xl">{activeProfile?.icon || '🦸'}</span>
