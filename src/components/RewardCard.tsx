@@ -4,6 +4,7 @@ import { type Reward } from '../types';
 import { Button } from './Button';
 import { Card } from './Card';
 import { triggerConfetti } from '../lib/confetti';
+import { playSuccessSound } from '../lib/sounds';
 import { useLocalizedTitle } from '../lib/useLocalizedTitle';
 import { useState } from 'react';
 
@@ -14,7 +15,16 @@ interface RewardCardProps {
 export const RewardCard = ({ reward }: RewardCardProps) => {
     const { t } = useTranslation();
     const { getRewardTitle } = useLocalizedTitle();
-    const { currentPoints, removePoints } = useStore();
+
+    // Profile-aware points
+    const profiles = useStore((state) => state.profiles);
+    const activeProfileId = useStore((state) => state.activeProfileId);
+    const legacyPoints = useStore((state) => state.currentPoints);
+    const removePoints = useStore((state) => state.removePoints);
+
+    const activeProfile = profiles.find(p => p.id === activeProfileId);
+    const currentPoints = activeProfile?.currentPoints ?? legacyPoints;
+
     const canAfford = currentPoints >= reward.cost;
     const [isExchanged, setIsExchanged] = useState(false);
 
@@ -24,6 +34,7 @@ export const RewardCard = ({ reward }: RewardCardProps) => {
         if (!canAfford) return;
         if (!confirm(t('reward.exchangeConfirm', { name: title }))) return;
 
+        playSuccessSound();
         removePoints(reward.cost, 'reward', reward.id, title);
         triggerConfetti();
         setIsExchanged(true);
